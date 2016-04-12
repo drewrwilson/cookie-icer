@@ -1,7 +1,6 @@
-# Two stage example Virtual Machine file
+# Based on Two stage example Virtual Machine file by Nadya Peek Dec 2014
 # moves get set in Main
 # usb port needs to be set in initInterfaces
-# Nadya Peek Dec 2014
 
 #------IMPORTS-------
 from pygestalt import nodes
@@ -15,6 +14,15 @@ from pygestalt.utilities import notice
 from pygestalt.publish import rpc	#remote procedure call dispatcher
 import time
 import io
+
+import sys # this is so we can read a parameter
+
+#------READ FILENAME AS PARAMETER------
+if (len(sys.argv) > 1):
+    filename = sys.argv[1]
+else:
+    filename = 'example-shapes.camm' # If no filename set, use this example name
+
 
 
 #------VIRTUAL MACHINE------
@@ -79,14 +87,68 @@ if __name__ == '__main__':
 	# This is for how fast the
 	stages.xyNode.setVelocityRequest(8)
 
-	# Some random moves to test with
-	moves = [[10,10],[20,20],[10,10],[0,0]]
-	## this is where we need to add the path as an array
+	# Read moves from file
 
+	# Open a .camm file created with the fab modules from an SVG
+	# This file is in HPGL format, a simple text file with
+	# PU (pen up) and PD (pen down commands)
+	# Each command is followed by an x,y coordinate to move to
+	# and delimited with semicolons. This reads all lines into one string.
+
+	with open(filename, 'r') as myfile:
+	    data="".join(line.rstrip() for line in myfile)
+
+	# Split the string into a list of individual commands
+
+	commands = data.split(";")
+
+	# For each command in the list, get the command
+	# (i.e. PU or PD, ignoring everything else)
+	# and the x, y coordinates
+	moves = []
+
+	for command in commands:
+
+
+	    # Using python string operations, get first two characters
+
+	    c = command[0:2]
+
+	    # Get everything after character 2 as a string
+
+	    coords = command[2:]
+
+	    # Split it into a list of coordinates
+
+	    coordlist = coords.split(",")
+
+	    # Take the x and coordinates
+
+	    x = coordlist[0]
+	    y = coordlist[-1]
+
+	    # Now do something with those commands and numbers
+	    # These prints can be replaced with gestalt commands
+
+	    #append the coordinates to array
+
+
+	    if (c == "PU") or (c == "PD"):
+	        tempcoord = []
+	        #x = int(x)
+	        #y = int(y)
+	        tempcoord.append(int(x))
+	        tempcoord.append(int(y))
+	        tempcoord.append(c)
+	        moves.append(tempcoord)
+
+	# Moves from file
+	# moves = [[10,10],[20,20],[10,10],[0,0]]
 
 	# Move!
 	for move in moves:
-		stages.move(move, 0)
+		justmovecoords = move[0:2] #remove the PU/PD
+		stages.move(justmovecoords, 0)
 		status = stages.xAxisNode.spinStatusRequest()
 		# This checks to see if the move is done.
 		while status['stepsRemaining'] > 0:
