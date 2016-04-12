@@ -81,6 +81,8 @@ if __name__ == '__main__':
 
 	# Some random moves to test with
 	moves = [[10,10],[20,20],[10,10],[0,0]]
+	## this is where we need to add the path as an array
+
 
 	# Move!
 	for move in moves:

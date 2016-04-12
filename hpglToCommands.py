@@ -1,10 +1,18 @@
+import sys # this is so we can read a parameter
+
+if (len(sys.argv) > 1):
+    filename = sys.argv[1]
+else:
+    filename = 'example-shapes.camm'
+
+
 # Open a .camm file created with the fab modules from an SVG
 # This file is in HPGL format, a simple text file with
 # PU (pen up) and PD (pen down commands)
 # Each command is followed by an x,y coordinate to move to
 # and delimited with semicolons. This reads all lines into one string.
 
-with open('fab_mod_drawing.camm', 'r') as myfile:
+with open(filename, 'r') as myfile:
     data="".join(line.rstrip() for line in myfile)
 
 # Split the string into a list of individual commands
@@ -14,8 +22,10 @@ commands = data.split(";")
 # For each command in the list, get the command
 # (i.e. PU or PD, ignoring everything else)
 # and the x, y coordinates
+allcoords = []
 
 for command in commands:
+
 
     # Using python string operations, get first two characters
 
@@ -37,7 +47,17 @@ for command in commands:
     # Now do something with those commands and numbers
     # These prints can be replaced with gestalt commands
 
-    if (c == "PU"):
-        print("pen up to " + x + ","+ y)
-    if (c == "PD"):
-        print("pen down to " + x + "," + y)
+    #append the coordinates to array
+
+
+    if (c == "PU") or (c == "PD"):
+        tempcoord = []
+        #x = int(x)
+        #y = int(y)
+        tempcoord.append(int(x))
+        tempcoord.append(int(y))
+        tempcoord.append(c)
+        allcoords.append(tempcoord)
+
+for thiscoord in allcoords:
+    print thiscoord
